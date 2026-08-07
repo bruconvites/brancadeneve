@@ -51,10 +51,10 @@
     var FRAME_IMG = {
         w:  864,
         h:  1536,
-        cx: 432,   // centro do oval do vidro (x)
-        cy: 768,   // centro do oval do vidro (y)
-        rx: 285,   // raio horizontal do vidro
-        ry: 445    // raio vertical do vidro
+        cx: 422,   // centro do oval do vidro (x)
+        cy: 806,   // centro do oval do vidro (y)
+        rx: 256,   // raio horizontal do vidro
+        ry: 404    // raio vertical do vidro
     };
 
     var ERASE_RADIUS = 46; // "grossura do dedo" em px de tela
@@ -250,6 +250,7 @@
         drawing = true;
         lastPoint = point;
         eraseAt(point);
+        hideIntroPhrase();
     }
 
     function continueDrawing(point) {
@@ -313,6 +314,8 @@
 
     function startCamera() {
 
+        if (stream) return; // evita pedir a câmera duas vezes
+
         showLoader(true);
 
         if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
@@ -353,12 +356,95 @@
 
     /* ======================================================
     TELA INICIAL
+
+    Some automaticamente assim que a página carrega — a câmera
+    já liga sozinha, sem precisar de um botão "Começar". O
+    navegador ainda vai mostrar o próprio aviso de permissão de
+    câmera (isso nenhum site consegue tirar), mas a nossa tela
+    de instrução deixa de aparecer.
     ====================================================== */
 
+    function skipWelcomeScreen() {
+        welcome.style.transition = 'none';
+        welcome.style.display = 'none';
+    }
+
+    // mantém o botão funcionando também, caso a tela ainda
+    // apareça em algum navegador mais restritivo
     startButton.addEventListener('click', function () {
         welcome.classList.add('hide');
         startCamera();
     });
+
+    /* ======================================================
+    FRASE FLUTUANTE ("Espelho, espelho meu...")
+
+    Aparece por cima do espelho embaçado assim que a página
+    abre, e some suavemente assim que a pessoa tocar para
+    limpar (ou sozinha, depois de alguns segundos).
+    ====================================================== */
+
+    var introPhraseEl = null;
+    var introPhraseTimer = null;
+
+    function showIntroPhrase() {
+
+        introPhraseEl = document.createElement('div');
+        introPhraseEl.id = 'introPhrase';
+
+        introPhraseEl.style.position = 'fixed';
+        introPhraseEl.style.left = '0';
+        introPhraseEl.style.right = '0';
+        introPhraseEl.style.top = '9%';
+        introPhraseEl.style.zIndex = '40';
+        introPhraseEl.style.padding = '0 28px';
+        introPhraseEl.style.textAlign = 'center';
+        introPhraseEl.style.pointerEvents = 'none';
+        introPhraseEl.style.fontFamily = 'Georgia, "Times New Roman", serif';
+        introPhraseEl.style.color = '#fffaf0';
+        introPhraseEl.style.textShadow =
+            '0 2px 10px rgba(0,0,0,.6), 0 0 20px rgba(255,210,120,.55)';
+        introPhraseEl.style.transition = 'opacity .9s ease';
+        introPhraseEl.style.opacity = '0';
+
+        introPhraseEl.innerHTML =
+            '<div style="font-size:26px;font-weight:bold;letter-spacing:.3px;margin-bottom:10px;">' +
+            'Espelho, espelho meu...' +
+            '</div>' +
+            '<div style="font-size:16px;line-height:1.4;">' +
+            'Limpe o embaçado para revelar<br>quem foi convidado para o reino' +
+            '</div>';
+
+        document.body.appendChild(introPhraseEl);
+
+        // pequeno atraso para garantir a transição de fade-in
+        requestAnimationFrame(function () {
+            requestAnimationFrame(function () {
+                if (introPhraseEl) introPhraseEl.style.opacity = '1';
+            });
+        });
+
+        // some sozinha depois de um tempo, mesmo se a pessoa não tocar
+        introPhraseTimer = setTimeout(hideIntroPhrase, 6000);
+    }
+
+    function hideIntroPhrase() {
+
+        if (introPhraseTimer) {
+            clearTimeout(introPhraseTimer);
+            introPhraseTimer = null;
+        }
+
+        if (!introPhraseEl) return;
+
+        var el = introPhraseEl;
+        introPhraseEl = null;
+
+        el.style.opacity = '0';
+        setTimeout(function () {
+            if (el.parentNode) el.parentNode.removeChild(el);
+        }, 900);
+    }
 
     /* ======================================================
     TIRAR E SALVAR SELFIE
@@ -483,10 +569,28 @@
     window.addEventListener('orientationchange', onWindowResize);
 
     /* ======================================================
+    TEXTO DA TELA INICIAL MAIS DISCRETO
+
+    Deixa o título e o texto de instrução menores, sem precisar
+    alterar o style.css original.
+    ====================================================== */
+
+    function shrinkWelcomeText() {
+        var style = document.createElement('style');
+        style.textContent =
+            '#welcome .card h1{font-size:22px !important;margin-bottom:12px !important;}' +
+            '#welcome .card p{font-size:15px !important;}' +
+            '#welcome .sparkles{font-size:32px !important;}' +
+            '#welcome .card{padding:22px !important;}';
+        document.head.appendChild(style);
+    }
+
+    /* ======================================================
     INICIALIZAÇÃO
     ====================================================== */
 
     function init() {
+        shrinkWelcomeText();
         updateFrameMask();
         resizeCanvas();
 
