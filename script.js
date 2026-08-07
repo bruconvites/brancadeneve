@@ -89,11 +89,40 @@
     /* ======================================================
     MÁSCARA OVAL DA MOLDURA
 
-    Recorta a moldura (#frame) para deixar transparente apenas
-    a área do vidro, usando a mesma lógica do object-fit:cover
-    já aplicado a ela via CSS — assim o recorte acompanha
-    qualquer tamanho de tela.
+    Recorta a moldura (#frame) para deixar transparente APENAS
+    a área do vidro (um "buraco" oval), mantendo o resto da
+    moldura (borda dourada + jardim) visível normalmente.
+
+    Um clip-path simples do tipo ellipse() mantém visível SÓ
+    o oval e apaga tudo em volta — o efeito contrário do que
+    queremos. Por isso usamos uma máscara SVG: um retângulo do
+    tamanho da tela, com um oval "furado" nele (regra evenodd).
+    Isso sim mantém a moldura inteira e abre buraco só no vidro.
     ====================================================== */
+
+    function ensureClipDefs() {
+        if (document.getElementById('frameHoleClipPath')) return;
+
+        var svgNS = 'http://www.w3.org/2000/svg';
+
+        var svg = document.createElementNS(svgNS, 'svg');
+        svg.setAttribute('width', '0');
+        svg.setAttribute('height', '0');
+        svg.style.position = 'absolute';
+        svg.style.pointerEvents = 'none';
+
+        var clipPath = document.createElementNS(svgNS, 'clipPath');
+        clipPath.setAttribute('id', 'frameHoleClip');
+        clipPath.setAttribute('clipPathUnits', 'userSpaceOnUse');
+
+        var path = document.createElementNS(svgNS, 'path');
+        path.setAttribute('id', 'frameHoleClipPath');
+        path.setAttribute('fill-rule', 'evenodd');
+
+        clipPath.appendChild(path);
+        svg.appendChild(clipPath);
+        document.body.appendChild(svg);
+    }
 
     function updateFrameMask() {
 
@@ -105,11 +134,22 @@
 
         var rxPx = FRAME_IMG.rx * scale;
         var ryPx = FRAME_IMG.ry * scale;
+        var cx = w / 2;
+        var cy = h / 2;
 
-        var rxPct = (rxPx / w) * 100;
-        var ryPct = (ryPx / h) * 100;
+        ensureClipDefs();
 
-        var clip = 'ellipse(' + rxPct + '% ' + ryPct + '% at 50% 50%)';
+        // retângulo (tela toda) + oval do vidro, com regra evenodd:
+        // o resultado é "tela inteira, exceto o oval" — o buraco certo
+        var d =
+            'M0,0 H' + w + ' V' + h + ' H0 Z ' +
+            'M' + (cx - rxPx) + ',' + cy + ' ' +
+            'A' + rxPx + ',' + ryPx + ' 0 1,0 ' + (cx + rxPx) + ',' + cy + ' ' +
+            'A' + rxPx + ',' + ryPx + ' 0 1,0 ' + (cx - rxPx) + ',' + cy + ' Z';
+
+        document.getElementById('frameHoleClipPath').setAttribute('d', d);
+
+        var clip = 'url(#frameHoleClip)';
 
         frame.style.clipPath = clip;
         frame.style.webkitClipPath = clip;
@@ -464,3 +504,4 @@
     }
 
 })();
+
