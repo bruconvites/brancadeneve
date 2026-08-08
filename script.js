@@ -52,24 +52,24 @@
     ====================================================== */
 
     var FRAME_IMG = {
-        w:  941,
-        h:  1672,
-        cx: 468,   // centro do oval do vidro (x)
-        cy: 1140,  // centro do oval do vidro (y)
-        rx: 252,   // raio horizontal do vidro
-        ry: 347    // raio vertical do vidro
+        w:  1063,
+        h:  1890,
+        cx: 527,   // centro do oval do vidro (x)
+        cy: 1291,  // centro do oval do vidro (y)
+        rx: 279,   // raio horizontal do vidro
+        ry: 394    // raio vertical do vidro
     };
 
     var FOG_IMG = {
-        w:  1024,
-        h:  1536,
-        cx: 509,   // centro do oval de névoa (x)
-        cy: 785,   // centro do oval de névoa (y)
-        rx: 279,   // raio horizontal da névoa
-        ry: 395    // raio vertical da névoa
+        w:  1063,
+        h:  1890,
+        cx: 526,   // centro do oval de névoa (x)
+        cy: 1294,  // centro do oval de névoa (y)
+        rx: 288,   // raio horizontal da névoa
+        ry: 408    // raio vertical da névoa
     };
 
-    var ERASE_RADIUS = 46; // "grossura do dedo" em px de tela
+    var ERASE_RADIUS = 28; // "grossura do dedo" em px de tela
 
     var dpr = Math.max(1, window.devicePixelRatio || 1);
     var stream = null;
@@ -146,8 +146,14 @@
 
         var rxPx = FRAME_IMG.rx * scale;
         var ryPx = FRAME_IMG.ry * scale;
-        var cx = w / 2;
-        var cy = h / 2;
+
+        // a imagem fica centralizada na tela (object-fit:cover), então
+        // um ponto que está deslocado do centro DA IMAGEM (como o vidro,
+        // que agora fica mais para baixo por causa do texto) precisa
+        // desse mesmo deslocamento aplicado a partir do centro da tela —
+        // e não sempre exatamente no centro da tela.
+        var cx = w / 2 + (FRAME_IMG.cx - FRAME_IMG.w / 2) * scale;
+        var cy = h / 2 + (FRAME_IMG.cy - FRAME_IMG.h / 2) * scale;
 
         ensureClipDefs();
 
@@ -166,8 +172,8 @@
         frame.style.clipPath = clip;
         frame.style.webkitClipPath = clip;
 
-        oval.cx = w / 2;
-        oval.cy = h / 2;
+        oval.cx = cx;
+        oval.cy = cy;
         oval.rx = rxPx;
         oval.ry = ryPx;
     }
