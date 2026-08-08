@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+
+<meta charset="UTF-8">
+<meta
+name="viewport"
+content="width=device-width,initial-scale=1.0,maximum-scale=1,user-scalable=no">
+
+<title>Espelho Mágico</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Cinzel:wght@500;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+<!-- =======================================================
+FUNDO
+======================================================= -->
+
+<div id="app">
+
+    <!-- câmera -->
+    <video
+        id="camera"
+        autoplay
+        playsinline
+        muted>
+    </video>
+
+    <!-- selfie congelada (Cena 2) — ocupa o lugar da câmera -->
+    <img
+        id="selfieFreeze"
+        draggable="false">
+
+    <!-- canvas onde ficará o espelho embaçado -->
+    <canvas id="fogCanvas"></canvas>
+
+    <!-- moldura -->
+    <img
+        id="frame"
+        src="primeira.jpg"
+        draggable="false">
+
+</div>
+
+<!-- =======================================================
+TELA DE ABERTURA
+======================================================= -->
+
+<div id="welcome">
+
+    <div class="card">
+
+        <div class="sparkles">
+            ✨
+        </div>
+
+        <h1>
+            Passe a mão no espelho<br>
+            e a magia vai começar!
+        </h1>
+
+        <p>
+
+            Primeiro toque em
+            <strong>Permitir</strong>
+            para ativar a câmera.
+
+        </p>
+
+        <button id="startButton">
+
+            👑
+
+            <span>
+                Começar a magia
+            </span>
+
+        </button>
+
+    </div>
+
+</div>
+
+<!-- =======================================================
+BOTÃO SELFIE
+======================================================= -->
+
+<button id="photoButton">
+
+📸
+
+</button>
+
+<!-- =======================================================
+FLASH
+======================================================= -->
+
+<div id="flash"></div>
+
+<!-- =======================================================
+PREVIEW
+======================================================= -->
+
+<div id="preview">
+
+    <div class="previewBox">
+
+        <img id="photoResult">
+
+        <div class="buttons">
+
+            <button id="savePhoto">
+
+                Salvar
+
+            </button>
+
+            <button id="closePreview">
+
+                Fechar
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- =======================================================
+LOADER
+======================================================= -->
+
+<div id="loader">
+
+<div class="loaderCircle"></div>
+
+</div>
+
+<!-- =======================================================
+MENSAGEM DE ERRO
+======================================================= -->
+
+<div id="errorBox">
+
+    <div class="errorCard">
+
+        <h2>
+
+            Ops...
+
+        </h2>
+
+        <p id="errorText">
+
+        </p>
+
+        <button id="closeError">
+
+            OK
+
+        </button>
+
+    </div>
+
+</div>
+
+<!-- =======================================================
+CENA 2 — TEXTO DO ESPELHO
+======================================================= -->
+
+<div id="scene2Text">
+    <p id="scene2Line1" class="scene2-line"></p>
+    <p id="scene2Line2" class="scene2-line"></p>
+</div>
+
+<!-- =======================================================
+CENA 2 — BRILHO DOURADO DA TRANSFORMAÇÃO
+======================================================= -->
+
+<div id="goldGlow"></div>
+
+<!-- =======================================================
+CENA 2 — REVELAÇÃO DA ANIVERSARIANTE
+======================================================= -->
+
+<img
+    id="revealImg"
+    src="aniversariante.jpg"
+    draggable="false">
+
+<!-- =======================================================
+CENA 3 — PORTAL / TRANSIÇÃO
+======================================================= -->
+
+<div id="scene3Glow"></div>
+
+<!-- =======================================================
+CENA 4 — VÍDEO
+======================================================= -->
+
+<video
+    id="sceneVideo"
+    src="video.mp4"
+    preload="auto"
+    playsinline
+    webkit-playsinline="true">
+</video>
+
+<div id="unmuteHint">
+    🔊 Toque para ativar o som
+</div>
+
+<!-- =======================================================
+CENA 5 — CONVITE / DADOS DA FESTA
+======================================================= -->
+
+<img
+    id="inviteImg"
+    src="interativo.jpg"
+    draggable="false">
+
+<button id="pixButton" aria-label="Copiar chave Pix"></button>
+
+<div id="pixToast">
+    ✔ Chave Pix copiada!
+</div>
+
+<!-- =======================================================
+IMAGEM DO EMBAÇADO
+======================================================= -->
+
+<img
+id="fogImage"
+src="embaçado.png"
+hidden>
+
+<!-- =======================================================
+SCRIPTS
+======================================================= -->
+
+<script src="script.js"></script>
+
+</body>
+</html>
